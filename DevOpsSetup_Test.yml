@@ -43,29 +43,7 @@
   - name: Jenkins is installed. Lets start 'Jenkins' now!
     service: name=jenkins state=started
 
-
-  - name: Wait until the file /var/lib/jenkins/secrets/initialAdminPassword is present before continuing
-    wait_for:
-      path: /var/lib/jenkins/secrets/initialAdminPassword
-  - name: You can find Jenkins admin password under 'debug'
-    command: cat /var/lib/jenkins/secrets/initialAdminPassword
-    register: out
-  - debug: var=out.stdout_lines
-
-
-- name: Start the Docker installation steps
-  hosts: docker-server
-  become: yes
-  become_method: sudo
-  gather_facts: no
-
-  tasks:
-
-  - name: Update 'apt' repository with latest versions of packages
-    apt:
-      update_cache: yes
-
-  - name: install docker prerequisite packages
+ - name: install docker prerequisite packages
     apt:
       name: ['ca-certificates', 'curl', 'gnupg', 'lsb-release']
       update_cache: yes
@@ -117,4 +95,12 @@
     service:
       name: docker
       state: restarted
+
+  - name: Wait until the file /var/lib/jenkins/secrets/initialAdminPassword is present before continuing
+    wait_for:
+      path: /var/lib/jenkins/secrets/initialAdminPassword
+  - name: You can find Jenkins admin password under 'debug'
+    command: cat /var/lib/jenkins/secrets/initialAdminPassword
+    register: out
+  - debug: var=out.stdout_lines
 ...
